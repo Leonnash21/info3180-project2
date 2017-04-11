@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+
+{% block js %}
+{% endblock %}
+
+
+{% block main %}
+
+<div >
+<h1>Profiles:</h1>
+</div>
+<br>
+<div >
+<ul>
+{% for user in users %}
+<li>
+<a href="/profile/{{user.id}}" method="post">
+
+{{user.username}}
+{{user.id}}
+</a>
+</li>
+
+{% endfor %}
+</ul>
+</div>
+ 
+{% endblock %}

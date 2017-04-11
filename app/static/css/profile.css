@@ -1,0 +1,83 @@
+body{
+  background-color: inherit;
+  
+}
+
+#profileTableID
+{
+  margin-bottom:10px;
+  margin-top:-330px;
+  margin-left:280px;
+  position:relative;
+  width: 375px;
+  color:#1E90FF;
+  
+  
+  
+  
+  
+}
+.profile{
+      border-collapse: collapse;
+  /*background: -webkit-linear-gradient(45deg, #49a09d, #5f2c82);*/
+  /*background: linear-gradient(45deg, #49a09d, #5f2c82);*/
+  overflow: hidden;
+  /*box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);*/
+  
+}
+#timeinfo{
+  border-collapse: collapse;
+  /*background: -webkit-linear-gradient(45deg, #49a09d, #5f2c82);*/
+  /*background: linear-gradient(45deg, #49a09d, #5f2c82);*/
+  overflow: hidden;
+  /*box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);*/
+  
+  
+ 
+  }
+
+#profilePic{
+  float:left;
+  margin-top:10px;
+  background:	#696969;
+  width:750px; 
+  border-radius:25px;
+  border-style:groove;
+  font-family: cursive;
+  font-weight: 700;
+  font-size: medium;
+  margin-left: 200px;
+  
+}
+
+
+#name{
+  border-collapse: collapse;
+  /*background: -webkit-linear-gradient(45deg, #49a09d, #5f2c82);*/
+  /*background: linear-gradient(45deg, #49a09d, #5f2c82);*/
+  overflow: hidden;
+  /*box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);*/
+  
+  
+}
+
+#info{
+  background:blue;
+  border:2px black;
+  color: black;
+  
+}
+
+.rotate90 {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+#pic
+{
+  margin-top:6px;
+  margin-left:10px;
+}
