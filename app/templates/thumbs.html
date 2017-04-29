@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+<header>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+</header>
+{% block main %}
+    {% include 'flash_messages.html' %}
+    
+<body>
+    <div ng-controller="wishCtrl">
+        <h2>Please select an image for your thumbnail</h2>
+        {% for image in imageList %}
+            <a href="/addwish/theimage"><img src="{{image}}" height="100" width="100" name="theimage"/></a>
+        {% endfor %}
+    </div>
+</body>
+{% endblock %}

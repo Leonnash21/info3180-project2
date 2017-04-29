@@ -15,7 +15,10 @@ itsdangerous
 wsgiref
 passlib
 bcrypt
+beautifulsoup4
+requests
 # ----------------------
 # Production Server
 # ----------------------
 gunicorn
+

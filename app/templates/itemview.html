@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+<header>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+</header>
+
+{% block main %}
+    <div ng-cloak ng-controller="wishCtrl" class="" style="max-width:400px;">
+        <h1>Your Wishlist</h1>
+        
+        
+        
+        {% for wishes in wishlists %}
+        
+            <div >
+                <img src="{{wishes.thumbnail}}" style="max-height:100px;max-width:100px;">
+            </div>
+            
+            <div>
+                Title: {{wishes.title}}
+            </div>
+            <div>
+                Description: {{wishes.description}}
+            </div>
+            <div>
+                Url:  {{wishes.websiteaddr}}
+            </div>
+            
+            <ul>
+                <li ng-repeat="x in wishes" class="col-md-16">{{x}}<span ng-click="removeItem($index)" style="cursor:pointer;" class="w3-right w3-margin-right">×</span></li>
+            </ul>
+
+
+  
+        
+        {% endfor %}
+
+    
+    
+    
+    </div>
+{% endblock %}
