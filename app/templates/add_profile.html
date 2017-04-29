@@ -1,9 +1,9 @@
 
-<div class="profile-form center-block">
+<div class="profile-form center-block" ng-controller="RegistrationCtrl">
     <h2>Add a profile</h2>
       <p>Fill in this form to create a profile</p>
 
-    <form role="form" ng-submit="checkAddProfile()" method="post">
+    <form role="form" ng-submit="checkAddProfile()" name="SignupForm">
         {{ form.csrf_token }}
 
             
@@ -29,12 +29,10 @@
             {{ form.sex(class='form-control', placeholder="Select your gender") }}
         </div>
       
-        
-        <div class="form-group" ng-model="biography" name="biography">
-            {{ form.biography.label }}
-            {{ form.biography(class='form-control', placeholder="Enter a short biography about yourself") }}
-        </div>
-        
+        <div class = "form-group" ng-model="email" name ="sex">
+            {{form.email.label}}
+            {{ form.email(class='form-control', placeholder="Enter email address") }}
+        </div>  
         
         <div class="form-group" ng-model="password" name="password">
             {{ form.password.label }}
@@ -47,12 +45,9 @@
         </div>  
         
         
-         <div class="form-group" ng-model="image" name="image">
-            {{ form.image.label }}
-            {{ form.image(class='form-control', placeholder="Select your profile photo") }}
-        </div>
+         
 
-        <button type="submit" class="btn btn-success btn-lg">Register</button>
+        <button type="submit" class="btn btn-success btn-lg" ng-click="add_profile()">Register</button>
         </form>
     
 </div>

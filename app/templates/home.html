@@ -2,21 +2,16 @@
 
 {% block main %}
     <h1 class="page-header">StarGaze Wishlist Project App</h1>
-    
-    <h2 class="lead">Welcome to the Wishlist application</h2>
 
-    <div class="row">
-        <div class="col-xs-4">Menu-ish</div>
-        <div class="col-xs-8"><ui-view>Detail-ish</ui-view></div>
-    </div>
-    
+    <ui-view>Detail-ish</ui-view>
 
 {% endblock %}
 
 {% block css %}
     <script src="/static/js/angular.pack.js" type="text/javascript"></script>
+    <script src="/static/js/app.js" type="text/javascript"></script>
 {% endblock %}
 
 {% block js %}
-    <!--<script src="/static/js/app.js" type="text/javascript"></script>-->
+    
 {% endblock %}

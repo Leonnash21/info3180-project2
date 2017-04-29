@@ -17,13 +17,14 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <link rel="stylesheet" href="/static/css/app.css">
+    <base href="/">
     {% block css %} {% endblock%}
   </head>
   <body ng-app="starGaze">
     <header>
         {% include "header.html" %}
     </header>
-    <main>
+    <main ng-controller="MainCtrl">
         <div class="container">
             {% block main %}{% endblock %}
         </div>

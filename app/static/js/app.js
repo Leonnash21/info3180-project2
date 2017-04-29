@@ -5,7 +5,7 @@
  * -------------------------------------------------
  */
 var WISHLIST_SETTINGS = {title_suffix: ' - StarGaze'};
-var WishlistApp = angular.module('starGaze', ['ui.router'])
+var WishlistApp = angular.module('starGaze', ['ui.router',])
     .config(function($locationProvider){
         $locationProvider.html5Mode(false).hashPrefix('!');
     })
@@ -22,11 +22,35 @@ var WishlistApp = angular.module('starGaze', ['ui.router'])
 
 	})
     .config(function($stateProvider){
-        // ToDo: Put state based route config here
+        // ToDo: Put route config here
+        // $routeProvider
+        //     .when('/register', {templateUrl: '/forms/register.html',
+        //           controller: 'RegistrationCtrl', title:'Register/Signup'});
+        var registerState = {name: 'register', url: '/register', 
+            templateUrl: '/forms/register.html', title:'Register/Signup',
+            controller: 'RegistrationCtrl'
+        };
+        $stateProvider.state({name: 'login', url:'/login',
+                templateUrl: '/forms/login.html', title: 'StarGaze Login',
+                controller: 'LoginCtrl'});
+
+        $stateProvider.state(registerState);
     })
     .run(function($rootScope, $http, $state, $timeout, $document){
         // set any default headers here
         // $http.defaults.headers.common['X-Custom-header'] = "some value"
+        
+        $rootScope.$on('$stateChangeSuccess',
+            function(event, to, toparm, fr, fromparms){
+                // this function sets up the browser title based on the 
+                // ui.state that was loaded
+                var t = 'No title yet';
+                if (to.title){
+                    t = (typeof(to.title) == 'function')? to.title(to, fr) : to.title;
+                }
+                $document[0].title = '' + t + WISHLIST_SETTINGS.title_suffix;
+            });
+
     });
 
 
@@ -56,7 +80,7 @@ function($scope, $state, $http){
 // Registration Controller
 WishlistApp.controller('RegistrationCtrl', ['$scope', '$state', '$http',
 function($scope, $state, $http){
-    
+    $scope.SignupForm = {};
     $scope.checkAddProfile = function(){
         // this function will make the http request to create the user
     }

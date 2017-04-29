@@ -26,12 +26,12 @@
           <ul class="nav navbar-nav navbar-right">
             
             {% if current_user.is_authenticated %}
-            <li {% if request.path == '' %}class="active"{% endif %}><a href="{{ url_for('logout') }}">Logout<a><li>
+            <li ui-sref-active="active"><a ui-sref="logout">Logout<a><li>
             <li><a ui-sref="wishlist" ui-sref-active="active">Wishlist</a></li>
-            <li><a ui-sref="wishlist" ui-sref-active="active">Share Wishlist</a></li>
+            <li><a ui-sref="share-wishlist" ui-sref-active="active">Share Wishlist</a></li>
             {% else %}
-            <li><a ui-sref="register" ui-sref-active="active">Register</a></li>
-            <li {% if request.path == '' %}class="active"{% endif %}><a href="{{ url_for('login') }}">Login</a></li>
+            <li ui-sref-active="active"><a ui-sref="register">Register</a></li>
+            <li ui-sref-active="active"><a ui-sref="login">Login</a></li>
             {% endif %}
           </ul>
         </div><!--/.nav-collapse -->
