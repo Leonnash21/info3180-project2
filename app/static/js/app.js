@@ -64,6 +64,9 @@ var WishlistApp = angular.module('starGaze', ['ui.router',])
  * SERVICES
  * -------------------------------------------------
  */
+// WishlistApp.service('flashMessage', ['$document', function(){
+    // this service to show flash messages on screen
+// }])
 
 
 /* -------------------------------------------------
@@ -99,16 +102,24 @@ function($scope, $state, $http){
     $scope.formdata = { // initial values for the form in this object
         email: '', password: '', remember_me: true
     };
-    $scope.message = '';
+    $scope.message = function(msg, color){
+        if (color === undefined)
+            color = "log"
+        if (color === "log")
+            console.log(msg);
+        else
+            console.error(msg);
+    };
     
     $scope.good_response = function(response) {
         var userdata;
         if (response.data.error){
-            $scope.message = 'Invalid email or password';
+            $scope.message('Invalid email or password', 'error');
             $scope.formdata.password = '';
             
         } else {
             userdata = response.data.data;
+            $scope.message('Welcome ' + userdata.firstname);
             angular.extend(window.SGDATA,
                       {username: userdata.firstname, email: userdata.email,
                       userid: userdata.id, token: userdata.token});
@@ -118,7 +129,7 @@ function($scope, $state, $http){
 
     };
     $scope.bad_response = function(response) {
-        $scope.message = 'There was an error we could not recover from. Please try again later.';
+        $scope.message('There was an error we could not recover from. Please try again later.', 'warn');
         $scope.formdata.password = '';
         
     };
@@ -128,6 +139,7 @@ function($scope, $state, $http){
         var logindata = {"email": $scope.formdata.email, "password": $scope.formdata.password},
         good = $scope.good_response, bad = $scope.bad_response;
         $http.post('/api/users/login', logindata).then(good, bad);
+    };
 }]);
 
 WishlistApp.controller('ProfileCtrl', ['$scope', '$state', '$http',
