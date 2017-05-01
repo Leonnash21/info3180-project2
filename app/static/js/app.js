@@ -29,7 +29,13 @@ var WishlistApp = angular.module('starGaze', ['ui.router',])
         var registerState = {name: 'register', url: '/register', 
             templateUrl: '/forms/register.html', title:'Register/Signup',
             controller: 'RegistrationCtrl'
-        };
+        },
+        profileState = {name: 'profile', url: '/profile',
+            templateUrl: '/tmpl/view_profile.html', title: "My Profile",
+            controller: 'ProfileCtrl',
+            resolve: { userT: function($stateparams, $http){
+                $http.get('/')
+            }}};
         $stateProvider.state({name: 'login', url:'/login',
                 templateUrl: '/forms/login.html', title: 'StarGaze Login',
                 controller: 'LoginCtrl'});
@@ -80,19 +86,56 @@ function($scope, $state, $http){
 // Registration Controller
 WishlistApp.controller('RegistrationCtrl', ['$scope', '$state', '$http',
 function($scope, $state, $http){
-    $scope.SignupForm = {};
+    $scope.formdata = {};
     $scope.checkAddProfile = function(){
         // this function will make the http request to create the user
+        console.log($scope);
     }
 }]);
 
 // Login Form Controller
 WishlistApp.controller('LoginCtrl', ['$scope', '$state', '$http',
 function($scope, $state, $http){
+    $scope.formdata = { // initial values for the form in this object
+        email: '', password: '', remember_me: true
+    };
+    $scope.message = '';
+    
+    $scope.good_response = function(response) {
+        var userdata;
+        if (response.data.error){
+            $scope.message = 'Invalid email or password';
+            $scope.formdata.password = '';
+            
+        } else {
+            userdata = response.data.data;
+            angular.extend(window.SGDATA,
+                      {username: userdata.firstname, email: userdata.email,
+                      userid: userdata.id, token: userdata.token});
+        // $state.go('/profile');
+            alert("Logged in and got token: " + userdata.token);
+        }
+
+    };
+    $scope.bad_response = function(response) {
+        $scope.message = 'There was an error we could not recover from. Please try again later.';
+        $scope.formdata.password = '';
+        
+    };
     
     $scope.doLogin = function() {
         // call the HTTP thingy to perform the actual login
-        
+        var logindata = {"email": $scope.formdata.email, "password": $scope.formdata.password},
+        good = $scope.good_response, bad = $scope.bad_response;
+        $http.post('/api/users/login', logindata).then(good, bad);
+}]);
+
+WishlistApp.controller('ProfileCtrl', ['$scope', '$state', '$http',
+function($scope, $state, $http){
+    $scope.formdata = {};
+    $scope.checkAddProfile = function(){
+        // this function will make the http request to create the user
+        console.log($scope);
     }
 }]);
 

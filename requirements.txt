@@ -17,6 +17,7 @@ passlib
 bcrypt
 beautifulsoup4
 requests
+pyjwt
 # ----------------------
 # Production Server
 # ----------------------

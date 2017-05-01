@@ -7,39 +7,39 @@
         {{ form.csrf_token }}
 
             
-        <div class="form-group" ng-model="firstname" name="firstname">
+        <div class="form-group" ng-model="formdata.firstname" name="firstname">
             {{ form.firstname.label }}
             {{ form.firstname(class='form-control', placeholder="Enter your Firstname") }}
         </div>
         
-        <div class="form-group" ng-model="lastname" name="lastname">
+        <div class="form-group" ng-model="formdata.lastname" name="lastname">
             {{ form.lastname.label }}
             {{ form.lastname(class='form-control', placeholder="Enter your lastname") }}
         </div>
         
         
-        <div class="form-group" ng-model="age" name="age">
+        <div class="form-group" ng-model="formdata.age" name="age">
             {{ form.age.label }}
             {{ form.age(class='form-control', placeholder="Select your age") }}
         </div>
           
           
-        <div class="form-group" ng-model="sex" name="sex">
+        <div class="form-group" ng-model="formdata.sex" name="sex">
             {{ form.sex.label }}
             {{ form.sex(class='form-control', placeholder="Select your gender") }}
         </div>
       
-        <div class = "form-group" ng-model="email" name ="sex">
+        <div class = "form-group" ng-model="formdata.email" name ="sex">
             {{form.email.label}}
             {{ form.email(class='form-control', placeholder="Enter email address") }}
         </div>  
         
-        <div class="form-group" ng-model="password" name="password">
+        <div class="form-group" ng-model="formdata.password" name="password">
             {{ form.password.label }}
             {{ form.password(class='form-control') }}
           </div>
           
-        <div class="form-group" ng-model="confirm" name="confirm">
+        <div class="form-group" ng-model="formdata.confirm" name="confirm">
             {{form.confirm.label}}
             {{ form.confirm(class='form-control') }}
         </div>  

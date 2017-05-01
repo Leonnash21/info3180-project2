@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Profile</title>
+    {% if current_user.is_authenticated %}<script>window.SGDATA={userid: "{{current_user.id}}", username: "{{current_user.firstname}}", email: "{{current_user.email}}", token: "{{current_user.token}}" };</script>
+    {% else %}<script>window.SGDATA={userid: -1, username: 'Anonymous', email: ''};</script>{% endif %}
+    <title>StarGaze</title>
 
     <!-- Bootstrap -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">

@@ -1,21 +1,4 @@
-{% extends "base.html" %}
-
-<header>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
-    <script src="{{ url_for('static', filename='app.js') }}"></script>
-    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='bootstrap.js') }}"></script>
-</header>
-
-{% block main %}
-
-    {% include 'flash_messages.html' %}
-  <head>
-    <title>Info3180-Project 2</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/profile.css">
-    
-  </head>
-  <br>
+<div class="" ng-controller="">
         <header>
              <h1 class="page-header">{{userp['firstname']}}'s Profile</h1>
         </header>
@@ -85,8 +68,6 @@
         
         <a class="btn" href="/api/user/{{profile.id}}/wishlists">View your wishlist</a>
         
-        <a class -="btn" href="{{ url_for('logout') }}">Logout</a></li>
+        <a class ="btn" href="{{ url_for('logout') }}">Logout</a></li>
     </div>
 </div>
-{% endblock %}
-{% endblock %}

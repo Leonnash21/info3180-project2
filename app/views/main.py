@@ -43,6 +43,10 @@ forms = {
     'share': (ShareForm, 'share.html')
 }
 
+templates = {
+    'profile': 'view_profile.html', 
+}
+
 @app.route('/')
 def home():
     """Render website's home page."""
@@ -57,13 +61,21 @@ def about():
 
 @app.route('/forms/<formname>.html', methods=['GET'])
 def form_view(formname):
-    print "calling formview with %s" % formname
-    # try:
-    formObject, template = forms[formname]
-    # except KeyError:
-        # abort(404)
-    
-    return render_template(template, form=formObject())
+    try:
+        formObject, template = forms[formname]
+    except KeyError:
+        abort(404)
+    return render_template(template, form=formObject(formdata=None))
+
+
+@app.route('/tmpl/<templatename>.html', methods=['GET'])
+def tmpl_view(templatename):
+    try:
+        tmpl = templates[templatename]
+    except KeyError:
+        abort(404)
+    return render_template(tmpl)
+
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):

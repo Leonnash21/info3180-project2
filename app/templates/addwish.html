@@ -2,17 +2,17 @@
         <br><h4>Please Add Your Wish</h4><br>
         <form ng-submit="doAddWish()" method="post" name="wish">
             <div class="form-group"  >
-                <div class="form-group" ng-model="title" name"title">
+                <div class="form-group" ng-model="formdata.title" name"title">
                     {{form.title.label}}
                     {{form.title(class='form-control', placeholder="Enter item title")}}
                 </div>
                 
-                <div class="form-group" ng-model="description" name"description">
+                <div class="form-group" ng-model="formdata.description" name"description">
                     {{form.description.label}}
                     {{form.description(class='form-control', placeholder="Enter item description")}}
                 </div>
                 
-                <div class="form-group" ng-model="websiteaddr" name="websiteaddr">
+                <div class="form-group" ng-model="formdata.websiteaddr" name="websiteaddr">
                     {{form.websiteaddr.label}}
                     {{form.websiteaddr(class='form-control', placeholder="Add item URL")}}
                     <button class="btn btn-warning btn-secondary" type="button" ng-click="view_thumbs(websiteaddr)">Image Search</button>

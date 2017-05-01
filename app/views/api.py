@@ -14,24 +14,36 @@ import smtplib
 import json
 import bcrypt
 import urlparse
+import requests
+import requests
+import time
+import jwt
 
-
-from app import app, db, login_manager
+from flask import Blueprint, request, make_response, jsonify
+from flask.views import MethodView
+from requests.auth import HTTPBasicAuth
+from .. import app, db, login_manager
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, g
 from flask_login import login_user, logout_user, current_user, login_required
 from flask.ext.sqlalchemy import SQLAlchemy
-from ..models import UserT, Wish, Token
-import requests
-import time
-from app import db
+from ..models import UserT, Wish, Token, BlacklistToken
 from werkzeug import secure_filename
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from time import strftime
 from random import randint
 from werkzeug.security import generate_password_hash, check_password_hash
 from bs4 import BeautifulSoup
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+
+        
+
+
+JWT_SECRET = 'secret'
+JWT_ALGORITHM = 'HS256'
+JWT_EXP_DELTA_SECONDS = 20
+
 
 ###
 # Routing for your application.
@@ -44,8 +56,8 @@ def add_profile():
     if request.method == 'POST':
         
         jsonD=json.loads(request.data)
-        
-        profile=UserT(jsonD.get('username'), firstname=jsonD.get('firstname'),
+        user = UserT.query.filter_by(email=jsonD.get('email')).first()
+        profile=UserT(firstname=jsonD.get('firstname'),
                       lastname=jsonD.get('lastname'), email=jsonD.get('email'),
                       password=bcrypt.hashpw(jsonD.get('password').encode('utf-8'), bcrypt.gensalt()),
                       datejoined=datetime.now().strftime("%Y-%m-%d"),
@@ -53,13 +65,45 @@ def add_profile():
         
         
         if profile:
+            
+            
             db.session.add(profile)
             db.session.commit()
-            response = jsonify({"error":None,"data":{'firstname':jsonD.get('firstname'),'lastname':jsonD.get('lastname'),'username':jsonD.get('username'),'email':jsonD.get('email'), 'age':jsonD.get('age'), 'sex':jsonD.get('sex')},"message":"Sucess"})
-        
+            
+            payload = {
+                    'user_id': jsonD.get('id'),
+                    'exp': datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)
+                    }
+            auth_token = jwt.encode(payload, JWT_SECRET, JWT_ALGORITHM)
+            responseObject = {
+                
+                'status': 'success',
+                'message': 'Successfully registered.',
+                'auth_token': auth_token.decode('utf-8')
+                }
+            return make_response(jsonify(responseObject)), 201
+            
+        elif not profile:
+            responseObject = {
+                'status': 'fail',
+                'message': 'User already exists. Please Log in.',
+            }
+            return make_response(jsonify(responseObject)), 202
         else:
-            response = jsonify({"error":"1","data":{},'message':'not signed up'})
-        return response
+            responseObject = {
+                'status': 'fail',
+                'message': 'Some error occurred. Please try again.'
+                }
+            return make_response(jsonify(responseObject)), 401
+           
+        
+            
+                
+            # response = jsonify({"error":None,"data":{'firstname':jsonD.get('firstname'),
+            #             'lastname':jsonD.get('lastname'),'email':jsonD.get('email'), 
+            #             'age':jsonD.get('age'), 'sex':jsonD.get('sex')},"message":"Sucess"})
+        
+    
 
         
     
@@ -73,49 +117,108 @@ def securepage():
 @app.route('/api/users/login', methods=["GET", "POST"])
 def login():
     
-    if request.method == "POST":
+    if request.method == "POST" :
         jsonD= json.loads(request.data)
         user = UserT.query.filter_by(email=jsonD.get('email')).first()
+        
+        # usrPass = "jsonD.get('id'):jsonD.get('password')"
+        
+        
+        
         if user and user.password == bcrypt.hashpw(jsonD.get('password').encode('utf-8'),
         user.password.decode().encode('utf-8')):
             
-            token = tokenGenerate()
-            # token = Token(user.id)
-            db.session.add(token)
-            db.session.commit()
+            # auth_token =base64.b64encode(usrPass)
+            if jwt_token:
+                
+                payload = {
+                    'user_id': jsonD.get('id'),
+                    'exp': datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)
+                    }
+                jwt_token = jwt.encode(payload, JWT_SECRET, JWT_ALGORITHM)
+                    
+                    
+                token = tokenGenerate()
+                tokenobj = Token(token, user.id)
+                responseObject = {
+                    'status': 'success',
+                    'message': 'Successfully logged in.',
+                    'auth_token':jwt_token.decode('utf-8'),
+                    'data':{'id':user.id,'email':jsonD.get('email'), 
+                    'firstname': jsonD.get('firstname'),'token':token}
+                }
+                
+               
+                db.session.add(tokenobj)
+                db.session.commit()
             
-            response = jsonify({"error":None,"data":{'id':user.id,'username':jsonD.get('username'),'token':token.token},"message":"logged"})
+                return make_response(jsonify(responseObject)), 200
+            else:
+                responseObject = {
+                    'status': 'fail',
+                    'message': 'Try again',
+                    "data":{}
+                }
+            return make_response(jsonify(responseObject)), 500
             
-        else:
-            response = jsonify({"error":"1","data":{},"message":'not logged in'})
-    return response
-        
-        
+            
+    
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
+# tokens = db.session.query(Token).all()
+# tokens = map(lambda x:x.token,tokens)
+# token = tokenGenerate()
+# while token in tokens:
+#     token = tokenGenerate()
 
 @login_manager.user_loader
-def load_user(id):
-    return UserT.query.get(int(id))
+def load_user(auth_token):
+    return UserT.query.get(auth_token)
 
 
 @app.route('/api/users/logout', methods=["POST"])
 def logout():
-    jsonD= json.loads(request.data)
-    token =Token.query.filter_by(token=jsonD('token')).first()
-    if token:
-        db.session.delete(token)
-        db.session.commit()
-        response = jsonify({'status':'logged out'})
-    else:
-        response = jsonify({'status':'not logged out'})
-    return response
     
-# tokens = db.session.query(Token).all()
-#         tokens = map(lambda x:x.token,tokens)
-#         token = tokenGenerate()
-#         while token in tokens:
-#             token = tokenGenerate()
+    auth_header = request.headers.get('Authorization')
+    
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        auth_token = ''
+    if auth_token:
+        resp = UserT.decode_auth_token(auth_token)
+        if not isinstance(resp, str):
+            # mark the token as blacklisted
+            blacklist_token = BlacklistToken(token=auth_token)
+            try:
+                # insert the token
+                db.session.add(blacklist_token)
+                db.session.commit()
+                responseObject = {
+                    'status': 'success',
+                    'message': 'Successfully logged out.'
+                }
+                return make_response(jsonify(responseObject)), 200
+            except Exception as e:
+                responseObject = {
+                    'status': 'fail',
+                    'message': e
+                }
+                return make_response(jsonify(responseObject)), 200
+        else:
+            responseObject = {
+                'status': 'fail',
+                'message': resp
+            }
+            return make_response(jsonify(responseObject)), 401
+    else:
+        responseObject = {
+            'status': 'fail',
+            'message': 'Provide a valid auth token.'
+        }
+        return make_response(jsonify(responseObject)), 403
+
+
             
 def tokenGenerate():
     return ''.join(random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') for i in range (16))
@@ -130,35 +233,70 @@ def flash_errors(form):
 
 
 
-@app.route('/api/users',methods=["POST","GET"])
-@login_required
-def list_profiles():
+# @app.route('/api/users',methods=["POST","GET"])
+# @login_required
+# def list_profiles():
     
-    users = db.session.query(UserT).all()
-    ulist=[]
-    for user in users:
-        ulist.append({'id':user.id, 'firstname':user.firstname, 
-        'lastname':user.lastname, 'username':user.username, 
-        'email':user.email, 'age':user.age, 'sex':user.sex})
+#     users = db.session.query(UserT).all()
+#     ulist=[]
+#     for user in users:
+#         ulist.append({'id':user.id, 'firstname':user.firstname, 
+#         'lastname':user.lastname,
+#         'email':user.email, 'age':user.age, 'sex':user.sex})
         
-    if (len(ulist)>0):
-        response = jsonify({"error":None,"data":{"users":ulist},"message":"Success"})
+#     if (len(ulist)>0):
+#         response = jsonify({"error":None,"data":{"users":ulist},"message":"Success"})
+#     else:
+#         response = jsonify({"error":"1","data":{},"message":"did not retrieve all users"})
+#     return response            
+    
+    
+@app.route('/api/users', methods=["GET"])
+
+def get():
+    # get the auth token
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
     else:
-        response = jsonify({"error":"1","data":{},"message":"did not retrieve all users"})
-    return response            
-    
-    
-    
-@app.route('/api/users/{userid}/', methods = ["GET","POST"])
-@login_required
+        auth_token = ''
+    if auth_token:
+        resp = UserT.decode_auth_token(auth_token)
+        if not isinstance(resp, str):
+            user = UserT.query.filter_by(id=resp).first()
+            responseObject = {
+                'status': 'success',
+                'data': {
+                    'user_id': user.id,
+                    'email': user.email,
+                    'admin': user.admin,
+                    'registered_on': user.datejoined
+                }
+            }
+            return make_response(jsonify(responseObject)), 200
+        responseObject = {
+            'status': 'fail',
+            'message': resp
+        }
+        return make_response(jsonify(responseObject)), 401
+    else:
+        responseObject = {
+            'status': 'fail',
+            'message': 'Provide a valid auth token.'
+        }
+        return make_response(jsonify(responseObject)), 401
+        
+        
+@app.route('/api/users/<userid>', methods = ["GET","POST"])
+# @login_required  # commented temporarily so I can work on the front end
 def profile_view(userid):
-    users = UserT.query.filter_by(userid=userid).first()
+    users = UserT.query.filter_by(id=userid).first()
     
     if users:
         
         response = jsonify({"error":None,"data":{'id':users.id,
                    'firstname':users.firstname,'lastname':users.lastname,
-                   'username':users.username,'email':users.email,'age':users.age,
+                   'email':users.email,'age':users.age,
                    'sex': users.sex, 'datejoined':timeI(users.datejoined)},
                    "message":"Success"})
 
@@ -169,7 +307,7 @@ def profile_view(userid):
     return response
             
 
-@app.route('/api/users/{userid}/wishlist', methods = ["GET", "POST", "DELETE"])
+@app.route('/api/users/<userid>/wishlist', methods = ["GET", "POST", "DELETE"])
 @login_required
 def wishlist(userid):
     if request.method == "POST":
@@ -197,9 +335,9 @@ def wishlist(userid):
         wish = Wish(users.id,websiteaddr=jsonD.get('websiteaddr'),thumbnail=jsonD.get('thumbnail'),
                title=jsonD.get('title'),description=jsonD.get('description'),
                added_on=datetime.now().strftime("%Y-%m-%d"))
-        if wish:
+        for w in wish:
             
-            db.session.delete(wish)
+            db.session.delete(w)
             db.session.commit()
             response = jsonify({"error":None,"data":{'userid':userid,
                        'url':jsonD.get('websiteaddr'),'thumbnail':wish.thumbnail,
@@ -214,7 +352,7 @@ def wishlist(userid):
         
         
         users = UserT.query.filter_by(id=userid).first()
-        wishes = Wish.query.filter_by(userid=users.id).all()
+        wishes = Wish.query.filter_by(user_id=users.id).all()
         wishl = []
         for wish in wishes:
             wishl.append({'title':wish.name,'websiteaddr':wish.websiteaddr,
@@ -230,7 +368,7 @@ def wishlist(userid):
     return response
 
 
-@app.route('/api/users/{userid}/wishlist/{itemid}', methods = ["GET", "POST", "DELETE"])
+@app.route('/api/users/<userid>/wishlist/<itemid>', methods = ["GET", "POST", "DELETE"])
 @login_required
 def wishlist_item(userid, itemid):
     if request.method == 'POST':
@@ -242,7 +380,8 @@ def wishlist_item(userid, itemid):
         response = jsonify({"error": None, "message":"Success"})
     elif request.method == 'DELETE':
         # do the delete dance
-        response = 'DELETED'  # change this line
+        wish=wish.object.get(id=request.data.itemid)
+        response = jsonify({"error": N})# 'DELETED'  # change this line
     else: # it's a get
         # getter
         response = 'GOTTEN'  # change this line
@@ -279,10 +418,6 @@ def view_thumbs():
         response = jsonify({'error':'1','data':{},'message':'Thumbnail extraction failed'})
     return response
     
-    
-    
-
-  
 
 def timeI(entry):
     day = time.strftime("%a")

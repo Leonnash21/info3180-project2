@@ -11,15 +11,26 @@ from wtforms.widgets import TextArea
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 
-class LoginForm(FlaskForm):
+class NgFlaskForm(FlaskForm):
+    """This class adds the ng-model attribute to all form fields using a scope
+    variable named formdata. This so we don't need to edit the form template
+    to add the ng-model attribute for every field"""
+    def __init__(self, *arg, **kwarg):
+        super(NgFlaskForm, self).__init__(*arg, **kwarg)
+        for fieldname, fieldobj in self._fields.items():
+            fieldobj.render_kw = {'ng-model': 'formdata.%s' % fieldname}
+
+
+class LoginForm(NgFlaskForm):
     email = EmailField('Email', validators=[InputRequired(), Email()])
     password = PasswordField('Password', validators=[InputRequired()])
     remember_me = BooleanField('Remember me ')
 
 
-class SignupForm(Form):
+class SignupForm(NgFlaskForm):
     
-    firstname = TextField('Firstname', validators=[Required()])
+    firstname = TextField('Firstname', validators=[Required()],
+                          render_kw={'ng-model': 'formdata.firstname'})
     lastname = TextField('Lastname', validators=[Required()])
     email = EmailField('Email', validators=[InputRequired(), Email()])
     password = PasswordField('Password', validators=[Required(), EqualTo('confirm', message='Passwords must match')])
@@ -30,14 +41,14 @@ class SignupForm(Form):
     biography = TextField('Biography', validators=[Required()])
     
 
-class WishForm(Form):
+class WishForm(NgFlaskForm):
     title = TextField('Title',  validators=[Required()])
     description = TextField('Description',  validators=[Required()])
     websiteaddr = TextField('Reference',  validators=[Required()])
     # image
 
 
-class ShareForm(Form):
+class ShareForm(NgFlaskForm):
     emails = TextField('Share with:', validators=[Required()])
     message = TextField('Optional Message', widget=TextArea())
     
