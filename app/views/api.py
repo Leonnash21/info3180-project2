@@ -252,7 +252,7 @@ def flash_errors(form):
     
     
 @app.route('/api/users', methods=["GET"])
-
+@login_required
 def get():
     # get the auth token
     auth_header = request.headers.get('Authorization')

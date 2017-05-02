@@ -19,7 +19,7 @@
             <li {% if request.path == '' %}class="active"{% endif %}><a href="{{ url_for('add_profile') }}"> </a></li>
             <li {% if request.path == '' %}class="active"{% endif %}><a href="{{ url_for('about') }}"> </a></li>
             {% if current_user.is_authenticated %}
-            <li {% if request.path == '' %}class="active"{% endif %}><a href="{{ url_for('list_profiles') }}"> </a></li>
+            <li {% if request.path == '' %}class="active"{% endif %}><a href="{{ url_for('get') }}"> </a></li>
             {% endif %}
           </ul>
 

@@ -7,7 +7,7 @@
       
     <div id ="profilePic">
       <div id = "pic">
-    <img src="{{userp['image']}}" width="260" height="340">
+    
     
      
     <table id ="profileTableID" >
@@ -36,10 +36,12 @@
               <div class ="profile"> 
               <br>
               <br>
-              <p> Username : {{userp['username']}}</p>
+              <p> Firstname : {{userp['firstname']}}</p>
+              <p>Lastname: {{userp['lastname']}}</p>
               <p> User ID : {{userp['id']}}</p>
               <p> Gender : {{userp['gender']}} </p>
               <p> Age : {{userp['age']}}</p>
+              <p>Wish : {{[]}}</p>
               
               </div>
           </td>
@@ -49,7 +51,7 @@
           <td>
           <div id ="timeinfo">
             <br>
-          <p>  {{userp['biography']}} </p> 
+          <p>  {{userp['description']}} </p> 
           </div>
           </td>
         </tr>
